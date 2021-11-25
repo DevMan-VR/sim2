@@ -32,6 +32,7 @@ server_current_service_distribution = None
 server_current_arrival_distribution = None
 server_current_has_queue = None
 server_current_queue_capacity = None
+server_current_queue_is_infinite = None
 server_list = []
 
 SIZE_OF_TIMES = 100
@@ -40,7 +41,7 @@ server_current_arrival_time_list = []
 server_current_service_time_list = []
 
 class Server():
-    def __init__(self, index, configuration, service_distribution,arrival_distribution, has_wait_queue, queue_capacity, service_time_list, arrival_time_list):  
+    def __init__(self, index, configuration, service_distribution,arrival_distribution, has_wait_queue, queue_capacity, service_time_list, arrival_time_list, server_current_queue_is_infinite):  
         self.index = index
         self.configuration = configuration
         self.service_distribution = service_distribution
@@ -49,6 +50,7 @@ class Server():
         self.queue_capacity = queue_capacity
         self.service_time_list = service_time_list
         self.arrival_time_list = arrival_time_list
+        self.server_current_queue_is_infinite = server_current_queue_is_infinite
 
     def __str__(self):
         return "\nServer %s:\n\n\nconfiguration: %s,\n\nservice_distribution: %s,\n\narrival_distribution: %s,\n\nhas_wait_queue: %s,\n\nqueue_capacity: %s,\n\nservice_time_list: %s,\n\narrival_time_list: %s\n\n\n END SERVER %s\n"%(self.index,self.configuration, self.service_distribution,self.arrival_distribution,self.has_wait_queue,self.queue_capacity,self.service_time_list,self.arrival_time_list,self.index) 
@@ -58,13 +60,13 @@ class Server():
 
 
 class Server_Sequential(Server):
-    def __init__(self, index, configuration, service_distribution,arrival_distribution, has_wait_queue, queue_capacity, server_time_list, arrival_time_list, next_server_index):  
-        super().__init__(index,configuration,service_distribution,arrival_distribution,has_wait_queue,queue_capacity,server_time_list, arrival_time_list)
+    def __init__(self, index, configuration, service_distribution,arrival_distribution, has_wait_queue, queue_capacity, server_time_list, arrival_time_list, next_server_index, server_current_queue_is_infinite):  
+        super().__init__(index,configuration,service_distribution,arrival_distribution,has_wait_queue,queue_capacity,server_time_list, arrival_time_list, server_current_queue_is_infinite)
         self.next_server_index = next_server_index
 
 class Server_Parallel(Server):
-    def __init__(self, index, configuration, service_distribution, arrival_distribution, has_wait_queue, queue_capacity,server_time_list, arrival_time_list, next_server_up_index,next_server_down_index):
-        super().__init__(index, configuration,service_distribution, arrival_distribution, has_wait_queue, queue_capacity,server_time_list, arrival_time_list)
+    def __init__(self, index, configuration, service_distribution, arrival_distribution, has_wait_queue, queue_capacity,server_time_list, arrival_time_list, next_server_up_index,next_server_down_index,server_current_queue_is_infinite):
+        super().__init__(index, configuration,service_distribution, arrival_distribution, has_wait_queue, queue_capacity,server_time_list, arrival_time_list,server_current_queue_is_infinite)
         self.next_server_up_index = next_server_up_index
         self.next_server_down_index = next_server_down_index
 
@@ -90,7 +92,7 @@ class SampleApp(tk.Tk):
 
 
         self.frames = {}
-        for F in (Config_1, Config_2, Config_3_A,Config_4, Config_5, Config_6, Config_7, Config_8, Config_9, Config_10):
+        for F in (Config_1, Config_2, Config_3_A,Config_4, Config_5, Config_6, Config_7, Config_8, Config_9, Config_10, Config_11):
             page_name = F.__name__
             frame = F(parent=container, controller=self)
             self.frames[page_name] = frame
@@ -132,11 +134,6 @@ class Config_1(tk.Frame):
         server_current_configuration = self.server_config_option_combobox.get()
         print(server_current_configuration)
         self.controller.show_frame("Config_2")
-
-
-
-        
-
 
 
 
@@ -357,8 +354,53 @@ class Config_6(tk.Frame):
         else:
             self.controller.show_frame("Config_8")
 
-
 class Config_7(tk.Frame):
+
+    def __init__(self, parent, controller):
+        tk.Frame.__init__(self, parent)
+        self.controller = controller
+
+
+
+        label4 = tk.Label(self, text="¿La cola es finita o infinita?", font=controller.title_font)
+        label4.grid(row=1, column=1)
+
+        self.queue_is_infinite = tk.StringVar()
+        ttk.Radiobutton(self, text="Si", variable=self.queue_is_infinite, value="Si").grid(row=3,column=1)
+        ttk.Radiobutton(self, text="No", variable=self.queue_is_infinite, value="No").grid(row=3,column=2)
+
+
+
+        button2 = tk.Button(self, text="Atras",command=lambda:self.goBack())
+        button2.grid(row=5,column=2)
+
+
+        button = tk.Button(self, text="Siguiente",command=lambda:self.saveDataAndNext())
+        button.grid(row=5,column=3)
+
+
+    
+    def goBack(self):
+        self.controller.show_frame("Config_6")
+        
+
+    def saveDataAndNext(self):
+        
+        global server_current_queue_is_infinite 
+
+        if(self.queue_is_infinite == "Si"):
+            server_current_queue_is_infinite = True
+            self.controller.show_frame("Config_9")
+            
+        else:
+            server_current_queue_is_infinite = False
+            self.controller.show_frame("Config_8")
+        
+        
+
+        
+
+class Config_8(tk.Frame):
 
     def __init__(self, parent, controller):
         tk.Frame.__init__(self, parent)
@@ -383,7 +425,7 @@ class Config_7(tk.Frame):
 
     
     def goBack(self):
-        self.controller.show_frame("Config_6")
+        self.controller.show_frame("Config_7")
         
 
     def saveDataAndNext(self):
@@ -391,11 +433,11 @@ class Config_7(tk.Frame):
         global server_current_queue_capacity 
         server_current_queue_capacity = self.capacity.get()
 
-        self.controller.show_frame("Config_8")
+        self.controller.show_frame("Config_9")
 
 
 
-class Config_8(tk.Frame):
+class Config_9(tk.Frame):
 
     def __init__(self, parent, controller):
         tk.Frame.__init__(self, parent)
@@ -421,12 +463,13 @@ class Config_8(tk.Frame):
         global server_current_queue_capacity
         global server_current_arrival_time_list
         global server_current_service_time_list
+        global server_current_queue_is_infinite
         
         print("Server list before: ")
         print(server_list)
 
         
-        server = Server(server_current_index,server_current_configuration,server_current_service_distribution,server_current_arrival_distribution,server_current_has_queue,server_current_queue_capacity,server_current_service_time_list,server_current_arrival_time_list)
+        server = Server(server_current_index,server_current_configuration,server_current_service_distribution,server_current_arrival_distribution,server_current_has_queue,server_current_queue_capacity,server_current_service_time_list,server_current_arrival_time_list,server_current_queue_is_infinite)
         
         print("This is the new server adding: ", server)
 
@@ -434,13 +477,13 @@ class Config_8(tk.Frame):
         print("Server list after adding: ")
         print(server_list)
 
-        self.controller.show_frame("Config_9")
+        self.controller.show_frame("Config_10")
     
     def goBack(self):
-        self.controller.show_frame("Config_7")
+        self.controller.show_frame("Config_8")
 
 
-class Config_9(tk.Frame):
+class Config_10(tk.Frame):
 
     def __init__ (self, parent, controller):
         global server_list
@@ -462,10 +505,10 @@ class Config_9(tk.Frame):
 
 
     def simulate(self):
-        self.controller.show_frame("Config_10")
+        self.controller.show_frame("Config_11")
 
 
-class Config_10(tk.Frame):
+class Config_11(tk.Frame):
 
     def __init__ (self, parent, controller):
         global server_list
