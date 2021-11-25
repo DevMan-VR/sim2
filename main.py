@@ -33,12 +33,14 @@ server_current_arrival_distribution = None
 server_current_has_queue = None
 server_current_queue_capacity = None
 server_current_queue_is_infinite = None
+server_current_arrival_time_list = []
+server_current_service_time_list = []
+
 server_list = []
 
 SIZE_OF_TIMES = 100
 
-server_current_arrival_time_list = []
-server_current_service_time_list = []
+
 
 class Server():
     def __init__(self, index, configuration, service_distribution,arrival_distribution, has_wait_queue, queue_capacity, service_time_list, arrival_time_list, server_current_queue_is_infinite):  
@@ -278,10 +280,6 @@ class Config_5(tk.Frame):
         label2 = tk.Label(self, text="Define los parametros de la distribución de llegada", font=controller.title_font)
         label2.grid(row=0, column=1)
 
-        
-
-        
-
         button2 = tk.Button(self, text="Atras",command=lambda:self.goBack())
         button2.grid(row=3,column=1)
 
@@ -352,7 +350,7 @@ class Config_6(tk.Frame):
         if(self.has_queue.get() == "Si"):
             self.controller.show_frame("Config_7")
         else:
-            self.controller.show_frame("Config_8")
+            self.controller.show_frame("Config_9")
 
 class Config_7(tk.Frame):
 
