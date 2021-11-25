@@ -1,5 +1,7 @@
 from tkinter import StringVar
-
+import Server
+import ServerSequential
+import ServerParallel
 
 try:
     import tkinter as tk                # python 3
@@ -42,35 +44,11 @@ SIZE_OF_TIMES = 100
 
 
 
-class Server():
-    def __init__(self, index, configuration, service_distribution,arrival_distribution, has_wait_queue, queue_capacity, service_time_list, arrival_time_list, server_current_queue_is_infinite):  
-        self.index = index
-        self.configuration = configuration
-        self.service_distribution = service_distribution
-        self.arrival_distribution = arrival_distribution
-        self.has_wait_queue = has_wait_queue
-        self.queue_capacity = queue_capacity
-        self.service_time_list = service_time_list
-        self.arrival_time_list = arrival_time_list
-        self.server_current_queue_is_infinite = server_current_queue_is_infinite
-
-    def __str__(self):
-        return "\nServer %s:\n\n\nconfiguration: %s,\n\nservice_distribution: %s,\n\narrival_distribution: %s,\n\nhas_wait_queue: %s,\n\nqueue_capacity: %s,\n\nservice_time_list: %s,\n\narrival_time_list: %s\n\n\n END SERVER %s\n"%(self.index,self.configuration, self.service_distribution,self.arrival_distribution,self.has_wait_queue,self.queue_capacity,self.service_time_list,self.arrival_time_list,self.index) 
-
-    def __repr__(self):
-        return "\nServer %s:\n\n\nconfiguration: %s,\n\nservice_distribution: %s,\n\narrival_distribution: %s,\n\nhas_wait_queue: %s,\n\nqueue_capacity: %s,\n\nservice_time_list: %s,\n\narrival_time_list: %s\n\n\n END SERVER %s\n"%(self.index,self.configuration, self.service_distribution,self.arrival_distribution,self.has_wait_queue,self.queue_capacity,self.service_time_list,self.arrival_time_list,self.index) 
 
 
-class Server_Sequential(Server):
-    def __init__(self, index, configuration, service_distribution,arrival_distribution, has_wait_queue, queue_capacity, server_time_list, arrival_time_list, next_server_index, server_current_queue_is_infinite):  
-        super().__init__(index,configuration,service_distribution,arrival_distribution,has_wait_queue,queue_capacity,server_time_list, arrival_time_list, server_current_queue_is_infinite)
-        self.next_server_index = next_server_index
 
-class Server_Parallel(Server):
-    def __init__(self, index, configuration, service_distribution, arrival_distribution, has_wait_queue, queue_capacity,server_time_list, arrival_time_list, next_server_up_index,next_server_down_index,server_current_queue_is_infinite):
-        super().__init__(index, configuration,service_distribution, arrival_distribution, has_wait_queue, queue_capacity,server_time_list, arrival_time_list,server_current_queue_is_infinite)
-        self.next_server_up_index = next_server_up_index
-        self.next_server_down_index = next_server_down_index
+
+
 
 
 
