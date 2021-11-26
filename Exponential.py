@@ -2,7 +2,7 @@ from tkinter import *
 import numpy as np 
 from scipy import stats 
 import time
-from .RandomGenerator import pseudorandom_generator
+from RandomGenerator import pseudorandom_generator
 
 class ExponentialClass:
     def __init__(self, master=None, lambdaValue=None):
