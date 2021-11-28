@@ -47,59 +47,18 @@ class Server_Sequential():
 
     def getAndSetMinTimeEvent(self):
 
-        index_min = None
-        if(len(self.t_almost_arriving) > 0):
-            min_t_almost_arriving = min(self.t_almost_arriving)
-            index_min = min(range(len(min_t_almost_arriving)), key=min_t_almost_arriving.__getitem__)
-        else:
-            min_t_almost_arriving = None
-            index_min = None
-
-
-        if(min_t_almost_arriving != None):
-            if(self.t_departure < self.t_arrival and self.departure < min_t_almost_arriving):
-                self.min_attr_name = "departure"
-                return self.t_departure
-            elif(self.t_arrival < self.t_departure and self.t_arrival < min_t_almost_arriving):
-                self.min_attr_name = "arrival"
-                return self.t_arrival
-            elif (min_t_almost_arriving < self.t_arrival and min_t_almost_arriving < self.departure):
-                print("IS INTERING TO STATE ALMOST ARRIVING")
-
-                self.min_attr_name = "min_almost_arriving"
-                print("min_t_almost is: ", min_t_almost_arriving)
-                print("Self t almost arriving is: ", self.t_almost_arriving)
-                value = self.t_almost_arriving[index_min]
-                self.index_current_almost_arriving = index_min
-                return value
-
-            else:
-                return float("inf")
+        if(self.t_departure < self.t_arrival):
+            self.min_attr_name = "departure"
+            return self.t_departure
 
         else:
-            if(self.t_departure < self.t_arrival):
-                self.min_attr_name = "departure"
-                return self.t_departure
-
-            else:
-                self.min_attr_name = "arrival"
-                return self.t_arrival
-
-
+            self.min_attr_name = "arrival"
+            return self.t_arrival
 
 
     def arriveOneAtTime(self,new_t_arrival):
-        if(len(self.t_almost_arriving) == 0):
-            #Si no nadie en proceso de llegada
-            self.t_arrival = new_t_arrival
-        else:
-            self.t_almost_arriving.append(new_t_arrival)
-            
-
-    def almostToArrived(self):
-        self.t_arrival = self.t_almost_arriving[self.index_current_almost_arriving]
-        self.t_almost_arriving.pop(self.index_current_almost_arriving)
-        self.index_current_almost_arriving = None
+        print("new arrival is in: ", new_t_arrival)
+        self.t_arrival = new_t_arrival
 
 
     def addOneToQueue(self):
@@ -171,8 +130,8 @@ class Server_Sequential():
         return self.t_departure
 
     def __str__(self):
-        return "\nServer Sequential %s:\nconfiguration: %s,\nself.server_state: %s,\n\nself.num_in_queue: %s,\n\nhas_wait_queue: %s,\n\nqueue_capacity: %s,\n\nself.t_departure: %s,\n\nself.t_arrival: %s\n\nserver_almost_arriving: %s\n\nEND SERVER %s\n"%(self.index,self.configuration, self.server_state,self.num_in_queue,self.has_wait_queue,self.queue_capacity,self.t_departure,self.t_arrival,self.t_almost_arriving,self.index) 
+        return "\nServer Sequential %s:\nconfiguration: %s,\nService distribution instance: %s\nArrival distribution instance:%s \nself.server_state: %s,\n\nself.num_in_queue: %s,\n\nhas_wait_queue: %s,\n\nqueue_capacity: %s,\n\nself.t_departure: %s,\n\nself.t_arrival: %s\n\nserver_almost_arriving: %s\n\nEND SERVER %s\n"%(self.index,self.configuration,self.service_distribution_instance,self.arrival_distribution_instance, self.server_state,self.num_in_queue,self.has_wait_queue,self.queue_capacity,self.t_departure,self.t_arrival,self.t_almost_arriving,self.index) 
 
     def __repr__(self):
-        return "\nServer Sequential %s:\nconfiguration: %s,\nself.server_state: %s,\n\nself.num_in_queue: %s,\n\nhas_wait_queue: %s,\n\nqueue_capacity: %s,\n\nself.t_departure: %s,\n\nself.t_arrival: %s\n\nserver_almost_arriving: %s\n\nEND SERVER %s\n"%(self.index,self.configuration, self.server_state,self.num_in_queue,self.has_wait_queue,self.queue_capacity,self.t_departure,self.t_arrival,self.t_almost_arriving,self.index) 
+        return "\nServer Sequential %s:\nconfiguration: %s,\nService distribution instance: %s\nArrival distribution instance:%s \nself.server_state: %s,\n\nself.num_in_queue: %s,\n\nhas_wait_queue: %s,\n\nqueue_capacity: %s,\n\nself.t_departure: %s,\n\nself.t_arrival: %s\n\nserver_almost_arriving: %s\n\nEND SERVER %s\n"%(self.index,self.configuration,self.service_distribution_instance,self.arrival_distribution_instance, self.server_state,self.num_in_queue,self.has_wait_queue,self.queue_capacity,self.t_departure,self.t_arrival,self.t_almost_arriving,self.index) 
 

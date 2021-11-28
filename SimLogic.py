@@ -30,8 +30,8 @@ class Simulation ():
         if(self.server_list[0].configuration == 'Serie'):
             print("t_departure is: ",self.server_list[0].t_departure )
         elif(self.server_list[0].configuration == 'Paralelo'):
-            print("t_departure_up is: ", self.server_list[0].t_departure_up)
-            print("t_departure_down is: ", self.server_list[0].t_departure_down)
+            print("t_departure_up is: ", self.server_list[0].t_departure1)
+            print("t_departure_down is: ", self.server_list[0].t_departure2)
 
 
     def time_advance(self): #Las llegadas solo pueden ocurrir al primer servidor
@@ -71,15 +71,11 @@ class Simulation ():
         
         if(actingServer.min_attr_name == 'arrival'):
             actingServer.arrival()
-        
-        elif(actingServer.min_attr_name == 'min_almost_arriving'):
-            actingServer.almostToArrived()
         else:
             actingServer.departure()
     
 
     
-
     def arriveToFirst(self):
         self.server_list[0].arriveOne()
     

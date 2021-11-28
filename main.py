@@ -1,7 +1,9 @@
 from tkinter import StringVar
-import Server
 import ServerSequential
 import ServerParallel
+from SimLogic import Simulation
+import numpy as np
+import pandas as pd
 
 try:
     import tkinter as tk                # python 3
@@ -38,9 +40,14 @@ server_current_queue_is_infinite = None
 server_current_arrival_time_list = []
 server_current_service_time_list = []
 
+server_current_service_distribution_instance = None
+server_current_arrival_distribution_instance = None
+
 server_list = []
 
 SIZE_OF_TIMES = 100
+
+simulation_instance = None
 
 
 
@@ -199,13 +206,18 @@ class Config_3_A(tk.Frame):
         global server_current_service_distribution
         global server_current_service_time_list
         global SIZE_OF_TIMES
+        global server_current_service_distribution_instance
         
+        dist = None
         if(server_current_service_distribution == "Exponencial"):
             lamb = float(self.entryExp.get())
-            server_current_service_time_list = ExponentialClass.va_pseudo_exp_generate(size=SIZE_OF_TIMES, lamb=lamb)
+            dist = ExponentialClass(lambdaValue=lamb)
             print("Lamb is", lamb)
-            print("server-current-service-items-list is: ")
-            print(server_current_service_time_list)
+
+
+        server_current_service_distribution_instance = dist
+        print("server_current_service_distribution_instance is: ")
+        print(server_current_service_distribution_instance)
 
 
 
@@ -284,14 +296,20 @@ class Config_5(tk.Frame):
     def saveDataAndNext(self):
 
         global server_current_arrival_distribution
-        global server_current_arrival_time_list
+        global server_current_arrival_distribution_instance
 
+        dist = None
         if(server_current_arrival_distribution == "Exponencial"):
             lamb = float(self.entryExp.get())
-            server_current_arrival_time_list = ExponentialClass.va_pseudo_exp_generate(size=SIZE_OF_TIMES, lamb=lamb)
+            dist = ExponentialClass(lambdaValue=lamb)
             print("Lamb is", lamb)
-            print("server-current-arrival-items-list is: ")
-            print(server_current_arrival_time_list)
+
+
+
+        server_current_arrival_distribution_instance = dist
+        
+        print("server_current_arrival_distribution_instance is: ")
+        print(server_current_arrival_distribution_instance)
 
         self.controller.show_frame("Config_6")
 
@@ -407,7 +425,7 @@ class Config_8(tk.Frame):
     def saveDataAndNext(self):
         
         global server_current_queue_capacity 
-        server_current_queue_capacity = self.capacity.get()
+        server_current_queue_capacity = int(self.capacity.get())
 
         self.controller.show_frame("Config_9")
 
@@ -440,12 +458,45 @@ class Config_9(tk.Frame):
         global server_current_arrival_time_list
         global server_current_service_time_list
         global server_current_queue_is_infinite
+
+        global server_current_service_distribution_instance
+        global server_current_arrival_distribution_instance
         
         print("Server list before: ")
         print(server_list)
+        server = None
 
-        
-        server = Server(server_current_index,server_current_configuration,server_current_service_distribution,server_current_arrival_distribution,server_current_has_queue,server_current_queue_capacity,server_current_service_time_list,server_current_arrival_time_list,server_current_queue_is_infinite)
+        if(server_current_configuration == 'Serie'):
+            server = ServerSequential.Server_Sequential(
+                server_current_index,
+                server_current_configuration,
+                server_current_service_distribution,
+                server_current_arrival_distribution,
+                server_current_has_queue,
+                server_current_queue_capacity,
+                server_current_service_time_list,
+                server_current_arrival_time_list,
+                None,
+                server_current_queue_is_infinite,
+                server_current_service_distribution_instance,
+                server_current_arrival_distribution_instance
+            )
+        else:
+            server = ServerParallel.Server_Parallel(
+                server_current_index,
+                server_current_configuration,
+                server_current_service_distribution,
+                server_current_arrival_distribution,
+                server_current_has_queue,
+                server_current_queue_capacity,
+                server_current_service_time_list,
+                server_current_arrival_time_list,
+                None,
+                None,
+                server_current_queue_is_infinite,
+                server_current_service_distribution_instance,
+                server_current_arrival_distribution_instance
+            )
         
         print("This is the new server adding: ", server)
 
@@ -499,10 +550,135 @@ class Config_11(tk.Frame):
 
     def simulate(self):
         global server_list
-        print("Printing the final structure list")
+        global simulation_instance
+
+        #Init indexes
+        for s in server_list:
+            print(s)
+            if(s.configuration == 'Serie'):
+                position = s.index +1
+                if(position < len(server_list)):
+                    s.next_server_index = s.index+1
+            
+            else:
+                position = s.index+1
+                #3 casos, hay 1 solo servidor siguiente, hay 2 o no hay ninguno
+                n_next = len(server_list) - position
+                if(n_next == 1):
+                    s.next_server_up_index= s.index+1
+                elif(n_next >= 2):
+                    s.next_server_up_index= s.index+1
+                    s.next_server_down_index= s.index+2
+    
+        print("SERVER_LIST BEFORE SIMULATION START IS ::::::: ")
         print(server_list)
-        print("Printing each one::: ")
-        for s in server_list: print(s)
+
+
+
+        simulation_instance = Simulation(server_list=server_list)
+        #while simulation_instance.clock <= 100 :
+        for i in range(1,10):
+            simulation_instance.time_advance() 
+
+        self.simulation_report()
+
+    
+    def simulation_report(self):
+        global simulation_instance
+        
+        num_arrivals = 0
+        number_in_queue = 0
+        lost_customers = 0
+        user_finished = 0
+        num_arrivals = simulation_instance.server_list[0].num_arrivals
+        for s in simulation_instance.server_list:
+            number_in_queue += s.num_in_queue
+            lost_customers += s.n_lost
+            user_finished += s.user_finished
+        
+        t = []
+        final_arr_column = []
+        final_arr_result = []
+
+        total_wait_time=0
+        for s in simulation_instance.server_list:
+            if(s.configuration == 'Serie'):
+                op1 = s.num_of_departures/s.dep_sum
+                op2 = s.dep_sum / simulation_instance.clock
+                
+                final_arr_column.append('Average service time server '+str(s.index))
+                final_arr_result.append(op1)
+                t.append(['Average service time server '+str(s.index),op1])
+
+                final_arr_column.append('Utilization server '+str(s.index))
+                final_arr_result.append(op2)
+                t.append(['Utilization server '+str(s.index),op2])
+
+                total_wait_time+=s.dep_sum
+
+
+            else:
+                op1_t1 = s.num_of_departures1/s.dep_sum1
+                op2_t1 = s.dep_sum1 / simulation_instance.clock
+                
+                final_arr_column.append('Average service time server T1 S')
+                final_arr_result.append(op1_t1)
+                t.append(['Average service time server T1 S', op1_t1])
+
+                final_arr_column.append('Utilization server T1 S')
+                final_arr_result.append(op2_t1)
+                t.append(['Utilization server T1 S', op2_t1])
+
+                op1_t2 = s.num_of_departures2/s.dep_sum2
+                op2_t2 = s.dep_sum2 / simulation_instance.clock
+
+                final_arr_column.append('Average service time server T2 S')
+                final_arr_result.append(op1_t2)
+                t.append(['Average service time server T2 S', op1_t2])
+
+                final_arr_column.append('Utilization server T2 S')
+                final_arr_result.append(op2_t2)
+                t.append(['Utilization server T2 S',op2_t2])
+
+                total_wait_time+=s.dep_sum1
+                total_wait_time+=s.dep_sum2
+
+        final_arr_column.append('Average interarrival time')
+        final_arr_result.append(simulation_instance.clock/num_arrivals)
+        t.append(['Average interarrival time',simulation_instance.clock/num_arrivals])
+
+        final_arr_column.append('People who had to wait in line')
+        final_arr_result.append(number_in_queue)
+        t.append(['People who had to wait in line', number_in_queue])
+
+        final_arr_column.append('Total average wait time')
+        final_arr_result.append(total_wait_time)
+        t.append(['Total average wait time', total_wait_time])
+
+        final_arr_column.append('Lost Customers')
+        final_arr_result.append(lost_customers)
+        t.append(['Lost Customers', lost_customers])
+
+        print("Columns of pandas are: ", final_arr_column)
+        print("Values of columns are: ", final_arr_result)
+        print("COLUMN LENGTH = ", len(final_arr_column))
+        print("VALUES LENGTH = ", len(final_arr_result))
+
+        print("-----------")
+        print("This is the final arr merged with data: ")
+        print(t)
+        print("-----------")
+
+        print("FINAL DATA IS:")
+        print("[num_arrivals: %s, number_in_queue: %s, total_wait_time: %s, users_finished: %s, lost_customers: %s"%(num_arrivals, number_in_queue, total_wait_time, user_finished, lost_customers))
+        
+        df=pd.DataFrame(columns=final_arr_column)
+
+        a=pd.Series(final_arr_result,index=df.columns)
+            
+        df=df.append(a,ignore_index=True)   
+            
+        df.to_excel('results_final.xlsx')
 
 
 

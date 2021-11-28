@@ -51,56 +51,28 @@ class Server_Parallel():
 
     def getAndSetMinTimeEvent(self):
 
-        if(len(self.t_almost_arriving) > 0):
-            min_t_almost_arriving = min(self.t_almost_arriving)
-            index_min = min(range(len(min_t_almost_arriving)), key=min_t_almost_arriving.__getitem__)
-        else:
-            min_t_almost_arriving = -1
-            index_min = None
 
         if(
             self.t_departure2 < self.t_arrival and 
-            self.t_departure2 < self.t_departure1 and 
-            self.t_departure2 < min_t_almost_arriving
+            self.t_departure2 < self.t_departure1
         ):
-            self.min_attr_name = "departure1"
+            self.min_attr_name = "departure2"
             return self.t_departure2
 
         elif(
             self.t_departure1 < self.t_arrival and 
-            self.t_departure1 < self.t_departure2 and
-            self.t_departure1 < min_t_almost_arriving
+            self.t_departure1 < self.t_departure2
         ):
-            self.min_attr_name = "departure2"
+            self.min_attr_name = "departure1"
             return self.t_departure1
 
-        elif(
-            min_t_almost_arriving != -1 and
-            min_t_almost_arriving < self.t_departure1 and
-            min_t_almost_arriving < self.t_departure2 and
-            min_t_almost_arriving < self.t_arrival
-            
-        ):
-            print("IS INTERING TO STATE ALMOST ARRIVING")
-            self.min_attr_name = "min_almost_arriving"
-            value = self.t_almost_arriving[index_min]
-            self.index_current_almost_arriving = index_min
-            return value
         else:
             self.min_attr_name = "arrival"
             return self.t_arrival
 
     def arriveOneAtTime(self,new_t_arrival):
-        if(len(self.t_almost_arriving) == 0):
-            #Si no nadie en proceso de llegada
-            self.t_arrival = new_t_arrival
-        else:
-            self.t_almost_arriving.append(new_t_arrival)
+        self.t_arrival = new_t_arrival
 
-    def almostToArrived(self):
-        self.t_arrival = self.t_almost_arriving[self.index_current_almost_arriving]
-        self.t_almost_arriving.pop(self.index_current_almost_arriving)
-        self.index_current_almost_arriving = None
 
 
     def addOneToQueue(self):
