@@ -79,25 +79,25 @@ class Server_Sequential():
                 if(self.server_current_queue_is_infinite == False):
                     if(self.num_in_queue < self.queue_capacity):
                         self.num_in_queue += 1
-                        self.t_arrival = self.simulation_instance.clock + self.arrival_distribution_instance.random_gen()
+                        self.t_arrival = self.simulation_instance.clock + abs(self.arrival_distribution_instance.random_gen())
                     else:
                         self.oneIsLost()
                         print("ONE IS LOST BABY DON'T HURT ME DON'T HURT ME NO MORE")
-                        self.t_arrival = self.simulation_instance.clock + self.arrival_distribution_instance.random_gen()
+                        self.t_arrival = self.simulation_instance.clock + abs(self.arrival_distribution_instance.random_gen())
                 else:
                     self.num_in_queue += 1
-                    self.t_arrival = self.simulation_instance.clock + self.arrival_distribution_instance.random_gen()
+                    self.t_arrival = self.simulation_instance.clock + abs(self.arrival_distribution_instance.random_gen())
             else:
                 self.oneIsLost()
                 print("ONE IS LOST BABY DON'T HURT ME DON'T HURT ME NO MORE")
-                self.t_arrival = self.simulation_instance.clock + self.arrival_distribution_instance.random_gen()
+                self.t_arrival = self.simulation_instance.clock + abs(self.arrival_distribution_instance.random_gen())
         else:
             #Server disponible
             self.server_state = 1
-            dep = self.service_distribution_instance.random_gen()
+            dep = abs(self.service_distribution_instance.random_gen())
             self.dep_sum += dep
             self.t_departure = self.simulation_instance.clock + dep
-            self.t_arrival = self.simulation_instance.clock + self.arrival_distribution_instance.random_gen()
+            self.t_arrival = self.simulation_instance.clock + abs(self.arrival_distribution_instance.random_gen())
 
         
         print("ARRIVAL ::: NEW t_arrival IS: ", self.t_arrival)
@@ -111,7 +111,7 @@ class Server_Sequential():
             self.userToNextServer()
             self.num_of_departures +=1
         else:
-            dep = self.service_distribution_instance.random_gen()
+            dep = abs(self.service_distribution_instance.random_gen())
             self.dep_sum += dep
             self.t_departure = self.simulation_instance.clock + dep
             self.num_in_queue -= 1

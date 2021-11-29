@@ -81,7 +81,9 @@ class Simulation ():
     
     
     def pushToNext(self, index):
-        self.server_list[index].arriveOneAtTime(new_t_arrival=(self.clock + self.server_list[index].arrival_distribution_instance.random_gen()))
+        new_t_arrival = self.clock + self.server_list[index].arrival_distribution_instance.random_gen()
+        new_t_arrival = abs(new_t_arrival)
+        self.server_list[index].arriveOneAtTime(new_t_arrival=(new_t_arrival))
         
     
     

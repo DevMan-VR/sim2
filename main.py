@@ -5,6 +5,9 @@ from SimLogic import Simulation
 import numpy as np
 import pandas as pd
 
+from distributions.Normal import NormalClass
+from distributions.Pascal import PascalClass
+
 try:
     import tkinter as tk                # python 3
     from tkinter import font as tkfont  # python 3
@@ -15,10 +18,22 @@ except ImportError:
 
 
 from distributions.Exponential import ExponentialClass
+from distributions.Uniforme_Discreta import UniformeDiscretaClass
+from distributions.Uniforme_Continua import UniformeContinuaClass
+from distributions.Bernoulli import BernoulliClass
+from distributions.Normal import NormalClass
+from distributions.Normal_Standard import NormalStandardClass
+from distributions.Binomial import BinomialClass
+from distributions.Poisson import PoissonClass
+from distributions.Geometrica import GeometricaClass
+from distributions.Erlang import ErlangClass
+from distributions.Weibull import WeibullClass
+from distributions.Pareto import ParetoClass
+from distributions.Tstudent import TstudentClass
 
 #Constants
 SERVER_CONFIG_OPTIONS = ["Serie", "Paralelo"]
-SERVER_DIST_OPTIONS = ["Uniforme Discreta","Uniforme Continua","Bernoulli","Exponencial","Normal","Normal Estandar","Binomial","Poisson","Geometrica","Erlang","Triangular","Weibull","Pareto","T-Student","Chi-Cuadrado"]
+SERVER_DIST_OPTIONS = ["Uniforme Discreta","Uniforme Continua","Bernoulli","Exponencial","Normal","Normal Estandar","Binomial","Poisson","Geometrica","Erlang","Weibull","Pareto","T-Student", "Pascal"]
 
 
 #Selections & Configuration
@@ -197,10 +212,133 @@ class Config_3_A(tk.Frame):
         print("comparison is: ",server_current_service_distribution == "Exponencial")
 
         if(server_current_service_distribution == "Exponencial"):
-            self.labelExp = tk.Label(self, text="Lambda", font=self.controller.title_font)
-            self.labelExp.grid(row=1, column=1)
-            self.entryExp = tk.Entry(self)
-            self.entryExp.grid(row=2, column=1)
+            self.label_exp = tk.Label(self, text="Lambda", font=self.controller.title_font)
+            self.label_exp.grid(row=1, column=1)
+            self.entry_exp = tk.Entry(self)
+            self.entry_exp.grid(row=2, column=1)
+
+        elif(server_current_service_distribution == "Uniforme Discreta"):
+            self.label_ud = tk.Label(self, text="n° de posibilidades", font=self.controller.title_font)
+            self.label_ud.grid(row=1, column=1)
+            self.entry_ud = tk.Entry(self)
+            self.entry_ud.grid(row=2, column=1)
+
+        elif(server_current_service_distribution == "Uniforme Continua"):
+            self.label_uc_1 = tk.Label(self, text="a", font=self.controller.title_font)
+            self.label_uc_1.grid(row=1, column=1)
+            self.entry_uc_1 = tk.Entry(self)
+            self.entry_uc_1.grid(row=2, column=1)
+
+            self.label_uc_2 = tk.Label(self, text="b", font=self.controller.title_font)
+            self.label_uc_2.grid(row=1, column=2)
+            self.entry_uc_2 = tk.Entry(self)
+            self.entry_uc_2.grid(row=2, column=2)
+
+        elif(server_current_service_distribution == "Bernoulli"):
+            self.label_ber = tk.Label(self, text="No hay parametros", font=self.controller.title_font)
+            self.label_ber.grid(row=1, column=1)
+        
+        elif(server_current_service_distribution == "Normal"):
+            self.label_nor_1 = tk.Label(self, text="mu", font=self.controller.title_font)
+            self.label_nor_1.grid(row=1, column=1)
+            self.entry_nor_1 = tk.Entry(self)
+            self.entry_nor_1.grid(row=2, column=1)
+
+            self.label_nor_2 = tk.Label(self, text="ro", font=self.controller.title_font)
+            self.label_nor_2.grid(row=1, column=2)
+            self.entry_nor_2 = tk.Entry(self)
+            self.entry_nor_2.grid(row=2, column=2)
+
+        elif(server_current_service_distribution == "Normal Estandar"):
+            self.label_nores_1 = tk.Label(self, text="mu", font=self.controller.title_font)
+            self.label_nores_1.grid(row=1, column=1)
+            self.entry_nores_1 = tk.Entry(self)
+            self.entry_nores_1.grid(row=2, column=1)
+
+            self.label_nores_2 = tk.Label(self, text="ro", font=self.controller.title_font)
+            self.label_nores_2.grid(row=1, column=2)
+            self.entry_nores_2 = tk.Entry(self)
+            self.entry_nores_2.grid(row=2, column=2)
+
+        elif(server_current_service_distribution == "Binomial"):
+            self.label_bin_1 = tk.Label(self, text="n", font=self.controller.title_font)
+            self.label_bin_1.grid(row=1, column=1)
+            self.entry_bin_1 = tk.Entry(self)
+            self.entry_bin_1.grid(row=2, column=1)
+
+            self.label_bin_2 = tk.Label(self, text="m", font=self.controller.title_font)
+            self.label_bin_2.grid(row=1, column=2)
+            self.entry_bin_2 = tk.Entry(self)
+            self.entry_bin_2.grid(row=2, column=2)
+        
+        elif(server_current_service_distribution == "Poisson"):
+            self.label_pos_1 = tk.Label(self, text="lambda", font=self.controller.title_font)
+            self.label_pos_1.grid(row=1, column=1)
+            self.entry_pos_1 = tk.Entry(self)
+            self.entry_pos_1.grid(row=2, column=1)
+
+            self.label_pos_2 = tk.Label(self, text="k", font=self.controller.title_font)
+            self.label_pos_2.grid(row=1, column=2)
+            self.entry_pos_2 = tk.Entry(self)
+            self.entry_pos_2.grid(row=2, column=2)
+
+        elif(server_current_service_distribution == "Geometrica"):
+            self.label_geo = tk.Label(self, text="k", font=self.controller.title_font)
+            self.label_geo.grid(row=1, column=2)
+            self.entry_geo = tk.Entry(self)
+            self.entry_geo.grid(row=2, column=2)
+
+        elif(server_current_service_distribution == "Erlang"):
+            self.label_er_1 = tk.Label(self, text="n", font=self.controller.title_font)
+            self.label_er_1.grid(row=1, column=1)
+            self.entry_er_1 = tk.Entry(self)
+            self.entry_er_1.grid(row=2, column=1)
+
+            self.label_er_2 = tk.Label(self, text="lambda", font=self.controller.title_font)
+            self.label_er_2.grid(row=1, column=2)
+            self.entry_er_2 = tk.Entry(self)
+            self.entry_er_2.grid(row=2, column=2)
+
+        elif(server_current_service_distribution == "Weibull"):
+            self.label_wei_1 = tk.Label(self, text="tasa de fallos", font=self.controller.title_font)
+            self.label_wei_1.grid(row=1, column=1)
+            self.entry_wei_1 = tk.Entry(self)
+            self.entry_wei_1.grid(row=2, column=1)
+
+            self.label_wei_2 = tk.Label(self, text="lambda", font=self.controller.title_font)
+            self.label_wei_2.grid(row=1, column=2)
+            self.entry_wei_2 = tk.Entry(self)
+            self.entry_wei_2.grid(row=2, column=2)
+
+        elif(server_current_service_distribution == "Pareto"):
+            self.label_par_1 = tk.Label(self, text="alfa", font=self.controller.title_font)
+            self.label_par_1.grid(row=1, column=1)
+            self.entry_par_1 = tk.Entry(self)
+            self.entry_par_1.grid(row=2, column=1)
+
+            self.label_par_2 = tk.Label(self, text="valor inicial", font=self.controller.title_font)
+            self.label_par_2.grid(row=1, column=2)
+            self.entry_par_2 = tk.Entry(self)
+            self.entry_par_2.grid(row=2, column=2)
+
+        elif(server_current_arrival_distribution == "T-Student"):
+            self.label_tstud = tk.Label(self, text="grados de libertad", font=self.controller.title_font)
+            self.label_tstud.grid(row=1, column=1)
+            self.entry_tstud = tk.Entry(self)
+            self.entry_tstud.grid(row=2, column=1)
+
+        elif(server_current_service_distribution == "Pascal"):
+            self.label_pasc_1 = tk.Label(self, text="k", font=self.controller.title_font)
+            self.label_pasc_1.grid(row=1, column=1)
+            self.entry_pasc_1 = tk.Entry(self)
+            self.entry_pasc_1.grid(row=2, column=1)
+
+            self.label_pasc_2 = tk.Label(self, text="m", font=self.controller.title_font)
+            self.label_pasc_2.grid(row=1, column=2)
+            self.entry_pasc_2 = tk.Entry(self)
+            self.entry_pasc_2.grid(row=2, column=2)
+
+
         
     def saveDataAndNext(self):
         global server_current_service_distribution
@@ -210,15 +348,110 @@ class Config_3_A(tk.Frame):
         
         dist = None
         if(server_current_service_distribution == "Exponencial"):
-            lamb = float(self.entryExp.get())
+            lamb = float(self.entry_exp.get())
             dist = ExponentialClass(lambdaValue=lamb)
             print("Lamb is", lamb)
+
+        elif(server_current_service_distribution == "Uniforme Discreta"):
+            n = float(self.entry_ud.get())
+            dist = UniformeDiscretaClass(n=n)
+            print("n° de posibilidades is", n)
+            print("Uniforme Discreta")
+        
+        elif(server_current_service_distribution == "Uniforme Continua"):
+            a = float(self.entry_uc_1.get())
+            b = float(self.entry_uc_2.get())
+            dist = UniformeContinuaClass(a=a, b=b)
+            print("A is ", a)
+            print("B is ", b)
+            print("Uniforme Continua")
+        
+        elif(server_current_service_distribution == "Bernoulli"):
+            dist = BernoulliClass()
+            print("Bernoulli")
+
+        elif(server_current_service_distribution == "Normal"):
+            mu = float(self.entry_nor_1.get())
+            ro = float(self.entry_nor_2.get())
+            dist = NormalClass(mu=mu, ro=ro)
+            print("Mu is ", mu)
+            print("Ro is ", ro)
+            print("Normal")
+
+        elif(server_current_service_distribution == "Normal Estandar"):
+            mu = float(self.entry_nores_1.get())
+            ro = float(self.entry_nores_2.get())
+            dist = NormalStandardClass(mu=mu, ro=ro)
+            print("Mu is ", mu)
+            print("Ro is ", ro)
+            print("Normal Estandar")
+
+        elif(server_current_service_distribution == "Binomial"):
+            n = float(self.entry_bin_1.get())
+            m = float(self.entry_bin_2.get())
+            dist = BinomialClass(n=n, m=m)
+            print("n is ", n)
+            print("m is ", m)
+            print("Binomial")
+
+        elif(server_current_service_distribution == "Poisson"):
+            lamb = float(self.entry_pos_1.get())
+            k = float(self.entry_pos_2.get())
+            dist = PoissonClass(lamb=lamb, k=k)
+            print("lamb is ", lamb)
+            print("k is ", k)
+            print("Poisson")
+
+        elif(server_current_service_distribution == "Geometrica"):
+            k = float(self.entry_geo.get())
+            dist = GeometricaClass(k=k)
+            print("k", k)
+            print("Geometrica")
+
+        elif(server_current_service_distribution == "Erlang"):
+            n = float(self.entry_er_1.get())
+            lamb = float(self.entry_er_2.get())
+            dist = ErlangClass(n=n,lamb=lamb)
+            print("Erlang")
+
+
+        elif(server_current_service_distribution == "Weibull"):
+            tasa_fallos = float(self.entry_wei_1.get())
+            lamb = float(self.entry_wei_2.get())
+            dist = WeibullClass(tasa_fallos=tasa_fallos, lamb=lamb)
+            print("tasa_fallos is ", tasa_fallos)
+            print("lamb is ", lamb)
+            print("Weibull")
+
+        elif(server_current_service_distribution == "Pareto"):
+            alpha = float(self.entry_par_1.get())
+            xm = float(self.entry_par_2.get())
+            dist = ParetoClass(alpha=alpha, xm=xm)
+            print("alfa is ", alpha)
+            print("initial = xm is ", xm)
+            print("Pareto")
+        
+        elif(server_current_service_distribution == "T-Student"):
+            v = float(self.entry_tstud.get())
+            dist = TstudentClass(v=v)
+            print("v", v)
+            print("T-Student")
+
+        elif(server_current_service_distribution == "Pascal"):
+            k = float(self.entry_pasc_1.get())
+            m = float(self.entry_pasc_2.get())
+            dist = PascalClass(k=k, m=m)
+            print("k is ", k)
+            print("m is ",m)
+            print("Pascal")
+        
 
 
         server_current_service_distribution_instance = dist
         print("server_current_service_distribution_instance is: ")
         print(server_current_service_distribution_instance)
 
+   
 
 
         
@@ -285,10 +518,137 @@ class Config_5(tk.Frame):
         print("comparison is: ",server_current_arrival_distribution == "Exponencial")
 
         if(server_current_arrival_distribution == "Exponencial"):
-            self.labelExp = tk.Label(self, text="Lambda", font=self.controller.title_font)
-            self.labelExp.grid(row=1, column=1)
-            self.entryExp = tk.Entry(self)
-            self.entryExp.grid(row=2, column=1)
+            self.label1 = tk.Label(self, text="Lambda", font=self.controller.title_font)
+            self.label1.grid(row=1, column=1)
+            self.entry1 = tk.Entry(self)
+            self.entry1.grid(row=2, column=1)
+
+        elif(server_current_arrival_distribution == "Uniforme Discreta"):
+            self.label1 = tk.Label(self, text="n° de posibilidades", font=self.controller.title_font)
+            self.label1.grid(row=1, column=1)
+            self.entry1 = tk.Entry(self)
+            self.entry1.grid(row=2, column=1)
+
+        elif(server_current_arrival_distribution == "Uniforme Continua"):
+            self.label1 = tk.Label(self, text="a", font=self.controller.title_font)
+            self.label1.grid(row=1, column=1)
+            self.entry1 = tk.Entry(self)
+            self.entry1.grid(row=2, column=1)
+
+            self.label2 = tk.Label(self, text="b", font=self.controller.title_font)
+            self.label2.grid(row=1, column=2)
+            self.entry2 = tk.Entry(self)
+            self.entry2.grid(row=2, column=2)
+
+
+        elif(server_current_arrival_distribution == "Bernoulli"):
+            self.label1 = tk.Label(self, text="No hay parametros", font=self.controller.title_font)
+            self.label1.grid(row=1, column=1)
+
+
+        elif(server_current_arrival_distribution == "Normal"):
+            self.label1 = tk.Label(self, text="mu", font=self.controller.title_font)
+            self.label1.grid(row=1, column=1)
+            self.entry1 = tk.Entry(self)
+            self.entry1.grid(row=2, column=1)
+
+            self.label2 = tk.Label(self, text="ro", font=self.controller.title_font)
+            self.label2.grid(row=1, column=2)
+            self.entry2 = tk.Entry(self)
+            self.entry2.grid(row=2, column=2)
+
+        elif(server_current_arrival_distribution == "Normal Estandar"):
+            self.label1 = tk.Label(self, text="mu", font=self.controller.title_font)
+            self.label1.grid(row=1, column=1)
+            self.entry1 = tk.Entry(self)
+            self.entry1.grid(row=2, column=1)
+
+            self.label2 = tk.Label(self, text="ro", font=self.controller.title_font)
+            self.label2.grid(row=1, column=2)
+            self.entry2 = tk.Entry(self)
+            self.entry2.grid(row=2, column=2)
+        
+        elif(server_current_arrival_distribution == "Binomial"):
+            self.label1 = tk.Label(self, text="n", font=self.controller.title_font)
+            self.label1.grid(row=1, column=1)
+            self.entry1 = tk.Entry(self)
+            self.entry1.grid(row=2, column=1)
+
+            self.label2 = tk.Label(self, text="m", font=self.controller.title_font)
+            self.label2.grid(row=1, column=2)
+            self.entry2 = tk.Entry(self)
+            self.entry2.grid(row=2, column=2)
+
+        elif(server_current_arrival_distribution == "Poisson"):
+            self.label1 = tk.Label(self, text="lambda", font=self.controller.title_font)
+            self.label1.grid(row=1, column=1)
+            self.entry1 = tk.Entry(self)
+            self.entry1.grid(row=2, column=1)
+
+            self.label2 = tk.Label(self, text="k", font=self.controller.title_font)
+            self.label2.grid(row=1, column=2)
+            self.entry2 = tk.Entry(self)
+            self.entry2.grid(row=2, column=2)
+
+        elif(server_current_arrival_distribution == "Geometrica"):
+            self.label1 = tk.Label(self, text="k", font=self.controller.title_font)
+            self.label1.grid(row=1, column=1)
+            self.entry1 = tk.Entry(self)
+            self.entry1.grid(row=2, column=1)
+
+        elif(server_current_arrival_distribution == "Erlang"):
+            self.label1 = tk.Label(self, text="n", font=self.controller.title_font)
+            self.label1.grid(row=1, column=1)
+            self.entry1 = tk.Entry(self)
+            self.entry1.grid(row=2, column=1)
+
+            self.label2 = tk.Label(self, text="lambda", font=self.controller.title_font)
+            self.label2.grid(row=1, column=2)
+            self.entry2 = tk.Entry(self)
+            self.entry2.grid(row=2, column=2)
+
+        elif(server_current_arrival_distribution == "Weibull"):
+            self.label1 = tk.Label(self, text="tasa de fallos", font=self.controller.title_font)
+            self.label1.grid(row=1, column=1)
+            self.entry1 = tk.Entry(self)
+            self.entry1.grid(row=2, column=1)
+
+            self.label2 = tk.Label(self, text="lambda", font=self.controller.title_font)
+            self.label2.grid(row=1, column=2)
+            self.entry2 = tk.Entry(self)
+            self.entry2.grid(row=2, column=2)
+
+        elif(server_current_arrival_distribution == "Pareto"):
+            self.label1 = tk.Label(self, text="alfa", font=self.controller.title_font)
+            self.label1.grid(row=1, column=1)
+            self.entry1 = tk.Entry(self)
+            self.entry1.grid(row=2, column=1)
+
+            self.label2 = tk.Label(self, text="valor inicial", font=self.controller.title_font)
+            self.label2.grid(row=1, column=2)
+            self.entry2 = tk.Entry(self)
+            self.entry2.grid(row=2, column=2)
+
+        elif(server_current_arrival_distribution == "T-Student"):
+            self.label1 = tk.Label(self, text="grados de libertad", font=self.controller.title_font)
+            self.label1.grid(row=1, column=1)
+            self.entry1 = tk.Entry(self)
+            self.entry1.grid(row=2, column=1)
+
+        elif(server_current_arrival_distribution == "Pascal"):
+            self.label1 = tk.Label(self, text="k", font=self.controller.title_font)
+            self.label1.grid(row=1, column=1)
+            self.entry1 = tk.Entry(self)
+            self.entry1.grid(row=2, column=1)
+
+            self.label2 = tk.Label(self, text="m", font=self.controller.title_font)
+            self.label2.grid(row=1, column=1)
+            self.entry2 = tk.Entry(self)
+            self.entry2.grid(row=2, column=1)
+
+        
+        
+
 
     def goBack(self):
         self.controller.show_frame("Config_4")
@@ -300,10 +660,105 @@ class Config_5(tk.Frame):
 
         dist = None
         if(server_current_arrival_distribution == "Exponencial"):
-            lamb = float(self.entryExp.get())
+            lamb = float(self.entry1.get())
             dist = ExponentialClass(lambdaValue=lamb)
             print("Lamb is", lamb)
+        
+        elif(server_current_arrival_distribution == "Uniforme Discreta"):
+            n = float(self.entry1.get())
+            dist = UniformeDiscretaClass(n=n)
+            print("n is", n)
+            print("Uniforme Discreta")
+        
+        elif(server_current_arrival_distribution == "Uniforme Continua"):
+            a = float(self.entry1.get())
+            b = float(self.entry2.get())
+            dist = UniformeContinuaClass(a=a, b=b)
+            print("A is ", a)
+            print("B is ", b)
+            print("Uniforme Continua")
+        
+        elif(server_current_arrival_distribution == "Bernoulli"):
+            #lamb = float(self.entryExp.get())
+            dist = BernoulliClass()
+            print("Bernoulli")
 
+        elif(server_current_arrival_distribution == "Normal"):
+            mu = float(self.entry1.get())
+            ro = float(self.entry2.get())
+            dist = NormalClass(mu=mu, ro=ro)
+            print("Mu is ", mu)
+            print("Ro is ", ro)
+            print("Normal")
+
+        elif(server_current_arrival_distribution == "Normal Estandar"):
+            mu = float(self.entry1.get())
+            ro = float(self.entry2.get())
+            dist = NormalStandardClass(mu=mu, ro=ro)
+            print("Mu is ", mu)
+            print("Ro is ", ro)
+            print("Normal Estandar")
+
+        elif(server_current_arrival_distribution == "Binomial"):
+            n = int(self.entry1.get())
+            m = int(self.entry2.get())
+            dist = BinomialClass(n=n, m=m)
+            print("n is ", n)
+            print("m is ", m)
+            print("Binomial")
+
+        elif(server_current_arrival_distribution == "Poisson"):
+            lamb = float(self.entry1.get())
+            k = float(self.entry2.get())
+            dist = PoissonClass(lamb=lamb, k=k)
+            print("lamb is ", lamb)
+            print("k is ", k)
+            print("Poisson")
+
+        elif(server_current_arrival_distribution == "Geometrica"):
+            k = float(self.entry1.get())
+            dist = GeometricaClass(k=k)
+            print("k is", k)
+
+            print("Geometrica")
+
+        elif(server_current_arrival_distribution == "Erlang"):
+            n = float(self.entry1.get())
+            lamb = float(self.entry2.get())
+            dist = ErlangClass(n=n,lamb=lamb)
+            print("Erlang")
+
+
+        elif(server_current_arrival_distribution == "Weibull"):
+            tasa_fallos = float(self.entry1.get())
+            lamb = float(self.entry2.get())
+            dist = WeibullClass(tasa_fallos=tasa_fallos, lamb=lamb)
+            print("tasa_fallos is ", tasa_fallos)
+            print("lamb is ", lamb)
+            print("Weibull")
+
+        elif(server_current_service_distribution == "Pareto"):
+            alpha = float(self.entry1.get())
+            xm = float(self.entry2.get())
+            dist = ParetoClass(alpha=alpha, xm=xm)
+            print("alfa is ", alpha)
+            print("initial = xm is ", xm)
+            print("Pareto")
+        
+        elif(server_current_arrival_distribution == "T-Student"):
+            v = float(self.entry1.get())
+            dist = TstudentClass(v=v)
+            print("v", v)
+            print("T-Student")
+
+        elif(server_current_arrival_distribution == "Pascal"):
+            k = float(self.entry1.get())
+            m = float(self.entry2.get())
+            dist = PascalClass(k=k, m=m)
+            print("k", k)
+            print("m", m)
+            print("Pacal")
+        
 
 
         server_current_arrival_distribution_instance = dist
@@ -541,11 +996,14 @@ class Config_11(tk.Frame):
         global server_list
         tk.Frame.__init__(self, parent)
         self.controller = controller
-        self.label = tk.Label(self, text="Listo para simular...", font=controller.title_font)
+        self.label = tk.Label(self, text="Primero agregue el tiempo de simulación, se recomienda un valor entre 100 y 300 unidades", font=controller.title_font)
         self.label.grid(row=1, column=1)
 
+        self.clock = ttk.Entry(self)
+        self.clock.grid(row=2,column=1)
+
         self.btn1 = tk.Button(self, text="Simular",command=lambda: self.simulate())
-        self.btn1.grid(row=2, column=1)
+        self.btn1.grid(row=3, column=1)
 
 
     def simulate(self):
@@ -576,8 +1034,10 @@ class Config_11(tk.Frame):
 
 
         simulation_instance = Simulation(server_list=server_list)
-        #while simulation_instance.clock <= 100 :
-        for i in range(1,10):
+        time_duration = int(self.clock.get())
+
+        while simulation_instance.clock <= time_duration :
+        #for i in range(1,10):
             simulation_instance.time_advance() 
 
         self.simulation_report()

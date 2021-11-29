@@ -94,12 +94,12 @@ class Server_Parallel():
                     if(self.num_in_queue < self.queue_capacity):
                         #Todavia hay cupo
                         self.num_in_queue +=1
-                        self.t_arrival=self.simulation_instance.clock+self.arrival_distribution_instance.random_gen()
+                        self.t_arrival= self.simulation_instance.clock+abs(self.arrival_distribution_instance.random_gen())
                     else:
                         self.oneIsLost()
                 else:
                     self.num_in_queue += 1
-                    self.t_arrival=self.simulation_instance.clock+self.arrival_distribution_instance.random_gen()
+                    self.t_arrival=self.simulation_instance.clock+abs(self.arrival_distribution_instance.random_gen())
             else:
                 self.oneIsLost()
         
@@ -108,28 +108,28 @@ class Server_Parallel():
             if np.random.choice([0,1])==1:
                 print("Case that chooses T1")
                 self.state_T1=1
-                dep1= self.service_distribution_instance.random_gen()
+                dep1= abs(self.service_distribution_instance.random_gen())
                 self.dep_sum1 += dep1
                 self.t_departure1=self.simulation_instance.clock + dep1
-                self.t_arrival=self.simulation_instance.clock+self.arrival_distribution_instance.random_gen()
+                self.t_arrival=self.simulation_instance.clock+ abs(self.arrival_distribution_instance.random_gen())
                 print("NEW DEPARTURE SCHEDULED ::: t_departure1 is: ", self.t_departure1)
 
             else:
                 print("Case that chooses T2")
                 self.state_T2=1
-                self.dep2= self.service_distribution_instance.random_gen()
+                self.dep2= abs(self.service_distribution_instance.random_gen())
                 self.dep_sum2 += self.dep2
                 self.t_departure2=self.simulation_instance.clock + self.dep2
-                self.t_arrival=self.simulation_instance.clock+self.arrival_distribution_instance.random_gen()
+                self.t_arrival=self.simulation_instance.clock+ abs(self.arrival_distribution_instance.random_gen())
                 print("NEW DEPARTURE SCHEDULED ::: t_departure2 is: ", self.t_departure2)
         
         elif(self.state_T1==0 and self.state_T2==1):
             print("Case t1 is avaible and t2 is busy")
             self.state_T1=1
-            dep1= self.service_distribution_instance.random_gen()
+            dep1= abs(self.service_distribution_instance.random_gen())
             self.dep_sum1 += dep1
             self.t_departure1=self.simulation_instance.clock + dep1
-            self.t_arrival=self.simulation_instance.clock+self.arrival_distribution_instance.random_gen()
+            self.t_arrival=self.simulation_instance.clock+ abs(self.arrival_distribution_instance.random_gen())
             print("NEW DEPARTURE SCHEDULED ::: t_departure1 is: ", self.t_departure1)
         
         elif(self.state_T1==1 and self.state_T2==0):
@@ -138,7 +138,7 @@ class Server_Parallel():
             self.dep2= self.service_distribution_instance.random_gen()
             self.dep_sum2 += self.dep2
             self.t_departure2=self.simulation_instance.clock + self.dep2
-            self.t_arrival=self.simulation_instance.clock+self.arrival_distribution_instance.random_gen()
+            self.t_arrival=self.simulation_instance.clock+ abs(self.arrival_distribution_instance.random_gen())
             print("NEW DEPARTURE SCHEDULED ::: t_departure2 is: ", self.t_departure2)
         else:
             print("Entering in an error state")
@@ -158,7 +158,7 @@ class Server_Parallel():
                 self.userToNextServerUp()
                 self.num_of_departures1 +=1
             else:
-                dep = self.service_distribution_instance.random_gen()
+                dep = abs(self.service_distribution_instance.random_gen())
                 self.dep_sum1 += dep
                 self.t_departure1 = self.simulation_instance.clock + dep
                 self.num_in_queue -= 1
@@ -172,7 +172,7 @@ class Server_Parallel():
                 self.userToNextServerDown()
                 self.num_of_departures2 +=1
             else:
-                dep = self.service_distribution_instance.random_gen()
+                dep = abs(self.service_distribution_instance.random_gen())
                 self.dep_sum2 += dep
                 self.t_departure2 = self.simulation_instance.clock + dep
                 self.num_in_queue -= 1
