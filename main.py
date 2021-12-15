@@ -1051,6 +1051,9 @@ class Config_11(tk.Frame):
         lost_customers = 0
         user_finished = 0
         num_arrivals = simulation_instance.server_list[0].num_arrivals
+
+        
+        
         for s in simulation_instance.server_list:
             number_in_queue += s.num_in_queue
             lost_customers += s.n_lost
@@ -1060,6 +1063,7 @@ class Config_11(tk.Frame):
         final_arr_column = []
         final_arr_result = []
 
+        total_service_time =0
         total_wait_time=0
         for s in simulation_instance.server_list:
             if(s.configuration == 'Serie'):
@@ -1074,7 +1078,7 @@ class Config_11(tk.Frame):
                 final_arr_result.append(op2)
                 t.append(['Utilization server '+str(s.index),op2])
 
-                total_wait_time+=s.dep_sum
+                total_service_time+=s.dep_sum
 
 
             else:
@@ -1100,8 +1104,12 @@ class Config_11(tk.Frame):
                 final_arr_result.append(op2_t2)
                 t.append(['Utilization server T2 S',op2_t2])
 
-                total_wait_time+=s.dep_sum1
-                total_wait_time+=s.dep_sum2
+                total_service_time+=s.dep_sum1
+                total_service_time+=s.dep_sum2
+
+
+        final_arr_column.append('Average user in system')
+        final_arr_result.append(num_arrivals/total_service_time)
 
         final_arr_column.append('Average interarrival time')
         final_arr_result.append(simulation_instance.clock/num_arrivals)

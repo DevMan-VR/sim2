@@ -46,19 +46,42 @@ class Server_Sequential():
         self.simulation_instance = instance
 
     def getAndSetMinTimeEvent(self):
+        #print("##############")
+        #print("Server index "+str(self.index)+" has a t_almost_arriving of: ")
+        #print(self.t_almost_arriving)
+        #print("##############")
 
-        if(self.t_departure < self.t_arrival):
+        next_arrival = float("inf")
+        if(self.index == 0):
+            next_arrival = self.t_arrival
+        else:
+            if(len(self.t_almost_arriving) == 0):
+                next_arrival = float("inf")
+            else:
+                index_min = min(range(len(self.t_almost_arriving)), key=self.t_almost_arriving.__getitem__)
+                next_arrival = self.t_almost_arriving[index_min]
+                self.index_current_almost_arriving = index_min
+    
+
+
+        if(self.t_departure < next_arrival):
             self.min_attr_name = "departure"
             return self.t_departure
 
         else:
             self.min_attr_name = "arrival"
-            return self.t_arrival
+            return next_arrival
+
+        
 
 
     def arriveOneAtTime(self,new_t_arrival):
         print("new arrival is in: ", new_t_arrival)
-        self.t_arrival = new_t_arrival
+
+        if(self.index == 0):
+            self.t_arrival = new_t_arrival
+        else:
+            self.t_almost_arriving.append(new_t_arrival)
 
 
     def addOneToQueue(self):
@@ -68,6 +91,20 @@ class Server_Sequential():
     def oneIsLost(self):
         self.n_lost +=1
     
+
+    def manageNewArrival(self):
+        if(self.index == 0): #Si es el primer servidor, se debe generar un nuevo time, sino se pregunta si tiene por un usuario por llegar
+            self.t_arrival = self.simulation_instance.clock + abs(self.arrival_distribution_instance.random_gen())
+            #self.num_arrivals += 1
+        else:
+            if(len(self.t_almost_arriving) > 0):
+                #Si hay usuarios por llegar se asigna el nuevo t como el time del menor
+                index_min = min(range(len(self.t_almost_arriving)), key=self.t_almost_arriving.__getitem__)
+                self.t_arrival = self.t_almost_arriving[index_min]
+                del self.t_almost_arriving[index_min] ##remove element from array
+            else:
+                #Si no hay usuarios por llegar se define el t_arrival como inf hasta que llegue un nuevo usuario
+                self.t_arrival = float("inf")
 
     def arrival(self):
 
@@ -79,25 +116,26 @@ class Server_Sequential():
                 if(self.server_current_queue_is_infinite == False):
                     if(self.num_in_queue < self.queue_capacity):
                         self.num_in_queue += 1
-                        self.t_arrival = self.simulation_instance.clock + abs(self.arrival_distribution_instance.random_gen())
+                        self.manageNewArrival()
+                                
                     else:
                         self.oneIsLost()
                         print("ONE IS LOST BABY DON'T HURT ME DON'T HURT ME NO MORE")
-                        self.t_arrival = self.simulation_instance.clock + abs(self.arrival_distribution_instance.random_gen())
+                        self.manageNewArrival()
                 else:
                     self.num_in_queue += 1
-                    self.t_arrival = self.simulation_instance.clock + abs(self.arrival_distribution_instance.random_gen())
+                    self.manageNewArrival()
             else:
                 self.oneIsLost()
                 print("ONE IS LOST BABY DON'T HURT ME DON'T HURT ME NO MORE")
-                self.t_arrival = self.simulation_instance.clock + abs(self.arrival_distribution_instance.random_gen())
+                self.manageNewArrival()
         else:
             #Server disponible
             self.server_state = 1
             dep = abs(self.service_distribution_instance.random_gen())
             self.dep_sum += dep
             self.t_departure = self.simulation_instance.clock + dep
-            self.t_arrival = self.simulation_instance.clock + abs(self.arrival_distribution_instance.random_gen())
+            self.manageNewArrival()
 
         
         print("ARRIVAL ::: NEW t_arrival IS: ", self.t_arrival)
@@ -130,8 +168,8 @@ class Server_Sequential():
         return self.t_departure
 
     def __str__(self):
-        return "\nServer Sequential %s:\nconfiguration: %s,\nService distribution instance: %s\nArrival distribution instance:%s \nself.server_state: %s,\n\nself.num_in_queue: %s,\n\nhas_wait_queue: %s,\n\nqueue_capacity: %s,\n\nself.t_departure: %s,\n\nself.t_arrival: %s\n\nserver_almost_arriving: %s\n\nEND SERVER %s\n"%(self.index,self.configuration,self.service_distribution_instance,self.arrival_distribution_instance, self.server_state,self.num_in_queue,self.has_wait_queue,self.queue_capacity,self.t_departure,self.t_arrival,self.t_almost_arriving,self.index) 
+        return "\nServer Sequential %s: [self.server_state: %s, self.num_in_queue: %s,self.t_departure: %s,self.t_arrival: %s,server_almost_arriving: %s END SERVER] %s\n"%(self.index, self.server_state,self.num_in_queue,self.t_departure,self.t_arrival,self.t_almost_arriving,self.index) 
 
     def __repr__(self):
-        return "\nServer Sequential %s:\nconfiguration: %s,\nService distribution instance: %s\nArrival distribution instance:%s \nself.server_state: %s,\n\nself.num_in_queue: %s,\n\nhas_wait_queue: %s,\n\nqueue_capacity: %s,\n\nself.t_departure: %s,\n\nself.t_arrival: %s\n\nserver_almost_arriving: %s\n\nEND SERVER %s\n"%(self.index,self.configuration,self.service_distribution_instance,self.arrival_distribution_instance, self.server_state,self.num_in_queue,self.has_wait_queue,self.queue_capacity,self.t_departure,self.t_arrival,self.t_almost_arriving,self.index) 
+        return "\nServer Sequential %s: [self.server_state: %s, self.num_in_queue: %s,self.t_departure: %s,self.t_arrival: %s,server_almost_arriving: %s END SERVER] %s\n"%(self.index, self.server_state,self.num_in_queue,self.t_departure,self.t_arrival,self.t_almost_arriving,self.index) 
 

@@ -1,3 +1,3 @@
-Falta continuar la lógica de simulación dinamica donde cada clase se encarga casi de todo sobre si misma 
+Se implementó la logica de listas para el Server Sequential, el almost arrive funciona para la tarea 3 
 
-Falta comprender bien el departure y luego comenzar con pruebas y tests
+Al parecer ya está funcionando la tarea 3 en lo básico, habria que empezar a ver punto a punto su cumplimiento

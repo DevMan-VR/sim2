@@ -7,13 +7,16 @@ class Simulation ():
     def __init__(self, server_list):
         self.server_list = server_list #List of CLASS SERVER SEQUENTIAL AND PARALLEL
 
-        self.num_arrivals=0 #total number of arrivals
+        self.num_arrivals=0 #total number of arrivals on SERVER 0
         self.total_wait_time=0.0
         self.number_in_queue=0 #customers who had to wait in line(counter)
         self.lost_customers=0 #customers who left without service
         self.customers_in_system =0
         self.clock=0.0 # Clock
+        self._arrivals = 0
+        self._departures = 0
 
+        self.constant_arrival = 1
 
         self.initialize_first_server()
         self.show_init_data()
@@ -46,7 +49,7 @@ class Simulation ():
             users_total_waiting += s.num_in_queue
 
 
-        print("SERVERS DATA ARE: " )
+        #print("SERVERS DATA ARE: " )
         for r in self.server_list:
             print(r)
 
@@ -64,15 +67,20 @@ class Simulation ():
         print("min index is: ", index_min)
 
         actingServer = self.server_list[index_min]
-        print("Current acting server is: ", actingServer) 
+       # print("Current acting server is: ", actingServer) 
         print("Acting Server attr_name event is: ",actingServer.min_attr_name )
         print("t_next_event IS: ", t_next_event)
 
         
         if(actingServer.min_attr_name == 'arrival'):
             actingServer.arrival()
+            self._arrivals += 1
+            print("Arriving to server index: ", actingServer.index)
+            
         else:
             actingServer.departure()
+            self._departures += 1
+            print("Departure from server index: ",actingServer.index)
     
 
     
@@ -81,7 +89,10 @@ class Simulation ():
     
     
     def pushToNext(self, index):
-        new_t_arrival = self.clock + self.server_list[index].arrival_distribution_instance.random_gen()
+        #new_t_arrival = self.clock + self.server_list[index].arrival_distribution_instance.random_gen()
+        
+        #push to next version hospital
+        new_t_arrival = self.clock + self.constant_arrival
         new_t_arrival = abs(new_t_arrival)
         self.server_list[index].arriveOneAtTime(new_t_arrival=(new_t_arrival))
         

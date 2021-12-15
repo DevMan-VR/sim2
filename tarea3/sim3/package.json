@@ -1,0 +1,15 @@
+{
+  "name": "sim3",
+  "version": "1.0.0",
+  "description": "",
+  "main": "preprocess.js",
+  "dependencies": {
+    "cli-progress": "^3.9.1"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC"
+}
